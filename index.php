@@ -2,6 +2,11 @@
 session_start();
 error_reporting(E_ALL);
 
+if(isset($_SESSION['login']) == false){
+	header("location:login.php");
+	exit;
+}
+
 // koneksi database
 $con = mysqli_connect("localhost","root","","YPDC");
 if (mysqli_connect_errno()) {
@@ -22,6 +27,8 @@ $sql.="SELECT id, nama_siswa, nama_ortu, tanggal_lahir, alamat, teachers_id, act
 $sql = "SELECT id, nama_siswa, nama_ortu, tanggal_lahir, alamat, teachers_id, active 
         FROM students ORDER BY id";
 $result = $con->query($sql);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -51,6 +58,7 @@ $result = $con->query($sql);
                 <th>Tanggal Lahir</th>
                 <th>Alamat</th>
                 <th>Aktif</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -62,6 +70,11 @@ $result = $con->query($sql);
                 <td><?= $row['tanggal_lahir'] ?></td>
                 <td><?= $row['alamat'] ?></td>
                 <td><?= $row['active'] ? 'Ya' : 'Tidak' ?></td>
+                <td>
+                	<a href="edit_student.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
+                	<a href="delete_student.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin hapus?')">Hapus</a>
+				</td>
+
             </tr>
             <?php endwhile; ?>
         </tbody>
