@@ -3,8 +3,9 @@ include 'config.php';
 
 // Ambil daftar teacher
 $teachers = $con->query("SELECT * FROM teachers");
+$parents = $con->query("SELECT DISTINCT nama_ortu FROM students");
 
-// Jika form dikirim
+
 if(isset($_POST['submit'])){
     $nama = $_POST['nama_siswa'];
     $ortu = $_POST['nama_ortu'];
@@ -13,6 +14,19 @@ if(isset($_POST['submit'])){
     $teacher_id = $_POST['teachers_id'];
     $active = isset($_POST['active']) ? 1 : 0;
 
+    // Cek apakah nama ortu sudah ada
+    $checkOrtu = $con->query("SELECT nama_ortu FROM students WHERE nama_ortu = '$ortu'");
+
+    if($checkOrtu->num_rows == 0){
+        // Jika belum ada, insert ke tabel parents
+        $con->query("INSERT INTO students (nama_ortu) VALUES ('$ortu')");
+        $parent_id = $con->insert_id;
+    } else {
+        $row = $checkOrtu->fetch_assoc();
+        $parent_id = $row['id'];
+    }
+
+    // Insert student
     $sql = "INSERT INTO students (nama_siswa, nama_ortu, tanggal_lahir, alamat, teachers_id, active)
             VALUES ('$nama','$ortu','$tgl_lahir','$alamat',$teacher_id,$active)";
 
@@ -40,8 +54,13 @@ if(isset($_POST['submit'])){
             <input type="text" name="nama_siswa" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label>Nama Orang Tua <span class="text-danger">*</span></label>
-            <input type="text" name="nama_ortu" class="form-control" required>
+            <label>Nama Orang Tua</label>
+            <input type="text" name="nama_ortu" list="parent_list" class="form-control" required>
+            <datalist id="parent_list">
+                <?php while($p = $parents->fetch_assoc()): ?>
+                    <option value="<?= $p['nama_ortu'] ?>">
+                <?php endwhile; ?>
+            </datalist>
         </div>
         <div class="mb-3">
             <label>Tanggal Lahir <span class="text-danger">*</span></label>
