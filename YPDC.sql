@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 23, 2026 at 02:16 AM
+-- Generation Time: Feb 23, 2026 at 04:03 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -72,6 +72,26 @@ INSERT INTO `bulan` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `daerah`
+--
+
+CREATE TABLE `daerah` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `daerah`
+--
+
+INSERT INTO `daerah` (`id`, `name`) VALUES
+(1, 'GDL'),
+(2, 'Spazio'),
+(3, 'DPU');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `kelas`
 --
 
@@ -89,26 +109,6 @@ INSERT INTO `kelas` (`id`, `name`) VALUES
 (2, 'Intermediate'),
 (3, 'Advance'),
 (4, 'Master');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `lokasi`
---
-
-CREATE TABLE `lokasi` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `lokasi`
---
-
-INSERT INTO `lokasi` (`id`, `name`) VALUES
-(1, 'DPU'),
-(2, 'Spazio'),
-(3, 'GDL');
 
 -- --------------------------------------------------------
 
@@ -173,6 +173,13 @@ CREATE TABLE `students` (
   `daerah_id` int(11) DEFAULT NULL,
   `teachers_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `students`
+--
+
+INSERT INTO `students` (`id`, `nama_siswa`, `nama_ortu`, `tanggal_lahir`, `alamat`, `active`, `tanggal_mulai`, `tanggal_selesai`, `jam`, `hari`, `daerah_id`, `teachers_id`) VALUES
+(6, 'Jonas', 'Poppy', '3312-02-11', '2312313', 1, NULL, NULL, NULL, NULL, NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -262,15 +269,15 @@ ALTER TABLE `bulan`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `kelas`
+-- Indexes for table `daerah`
 --
-ALTER TABLE `kelas`
+ALTER TABLE `daerah`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `lokasi`
+-- Indexes for table `kelas`
 --
-ALTER TABLE `lokasi`
+ALTER TABLE `kelas`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -333,16 +340,16 @@ ALTER TABLE `bulan`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
+-- AUTO_INCREMENT for table `daerah`
+--
+ALTER TABLE `daerah`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `kelas`
 --
 ALTER TABLE `kelas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `lokasi`
---
-ALTER TABLE `lokasi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `pembayaran`
@@ -354,7 +361,7 @@ ALTER TABLE `pembayaran`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `student_class`
