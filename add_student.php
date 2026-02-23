@@ -1,10 +1,10 @@
 <?php
 include 'config.php';
 
-// Ambil daftar teacher
+// Ambil daftar teacher dan daerah
 $teachers = $con->query("SELECT * FROM teachers");
+$daerahs = $con->query("SELECT * FROM daerah");
 $parents = $con->query("SELECT DISTINCT nama_ortu FROM students");
-
 
 if(isset($_POST['submit'])){
     $nama = $_POST['nama_siswa'];
@@ -13,22 +13,17 @@ if(isset($_POST['submit'])){
     $alamat = $_POST['alamat'];
     $teacher_id = $_POST['teachers_id'];
     $active = isset($_POST['active']) ? 1 : 0;
-
-    // Cek apakah nama ortu sudah ada
-    $checkOrtu = $con->query("SELECT nama_ortu FROM students WHERE nama_ortu = '$ortu'");
-
-    if($checkOrtu->num_rows == 0){
-        // Jika belum ada, insert ke tabel parents
-        $con->query("INSERT INTO students (nama_ortu) VALUES ('$ortu')");
-        $parent_id = $con->insert_id;
-    } else {
-        $row = $checkOrtu->fetch_assoc();
-        $parent_id = $row['id'];
-    }
+    $tanggal_mulai = $_POST['tanggal_mulai'];
+    $tanggal_selesai = $_POST['tanggal_selesai'];
+    $jam = $_POST['jam'];
+    $hari = $_POST['hari'];
+    $daerah_id = $_POST['daerah_id'];
 
     // Insert student
-    $sql = "INSERT INTO students (nama_siswa, nama_ortu, tanggal_lahir, alamat, teachers_id, active)
-            VALUES ('$nama','$ortu','$tgl_lahir','$alamat',$teacher_id,$active)";
+    $sql = "INSERT INTO students 
+            (nama_siswa, nama_ortu, tanggal_lahir, alamat, teachers_id, active, tanggal_mulai, tanggal_selesai, jam, hari, daerah_id)
+            VALUES 
+            ('$nama','$ortu','$tgl_lahir','$alamat',$teacher_id,$active,'$tanggal_mulai','$tanggal_selesai','$jam','$hari',$daerah_id)";
 
     if($con->query($sql)){
         header("Location: index.php");
@@ -43,7 +38,7 @@ if(isset($_POST['submit'])){
 <head>
     <meta charset="UTF-8">
     <title>Tambah Murid</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-4">
@@ -79,6 +74,31 @@ if(isset($_POST['submit'])){
                 <?php endwhile; ?>
             </select>
         </div>
+        <div class="mb-3">
+            <label>Tanggal Mulai</label>
+            <input type="date" name="tanggal_mulai" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Tanggal Selesai</label>
+            <input type="date" name="tanggal_selesai" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Jam</label>
+            <input type="text" name="jam" class="form-control" placeholder="08:00 - 10:00">
+        </div>
+        <div class="mb-3">
+            <label>Hari</label>
+            <input type="text" name="hari" class="form-control" placeholder="Senin / Selasa ...">
+        </div>
+        <div class="mb-3">
+            <label>Daerah</label>
+            <select name="daerah_id" class="form-select">
+                <option value="">-- Pilih Daerah --</option>
+                <?php while($d = $daerahs->fetch_assoc()): ?>
+                    <option value="<?= $d['id'] ?>"><?= $d['name'] ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div>
         <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" value="1" name="active" checked>
             <label class="form-check-label">Aktif</label>
@@ -87,6 +107,6 @@ if(isset($_POST['submit'])){
         <a href="index.php" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
