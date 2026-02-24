@@ -13,10 +13,34 @@ if(mysqli_connect_errno()){
     exit;
 }
 
+$limit = 10; // jumlah data per halaman
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if($page < 1) $page = 1;
+
+$start = ($page - 1) * $limit;
+
 $keyword = '';
-if(isset($_GET['search'])){
+$where = "";
+
+if(isset($_GET['search']) && $_GET['search'] != ''){
     $keyword = $con->real_escape_string($_GET['search']);
+    $where = " WHERE s.nama_siswa LIKE '%$keyword%' 
+               OR s.jam LIKE '%$keyword%'
+               OR s.hari LIKE '%$keyword%'
+               OR s.tanggal_mulai LIKE '%$keyword%'
+               OR s.tanggal_selesai LIKE '%$keyword%'";
 }
+
+
+$count_sql = "SELECT COUNT(*) as total 
+              FROM students s
+              LEFT JOIN teachers t ON s.teachers_id = t.id
+              LEFT JOIN daerah d ON s.daerah_id = d.id
+              $where";
+
+$count_result = $con->query($count_sql);
+$total_data = $count_result->fetch_assoc()['total'];
+$total_pages = ceil($total_data / $limit);
 
 $sql = "SELECT 
             s.id, s.nama_siswa, s.nama_ortu, s.tanggal_lahir, s.alamat, s.active, 
@@ -24,19 +48,14 @@ $sql = "SELECT
             t.name AS teachers_name, d.name AS daerah_name
         FROM students s
         LEFT JOIN teachers t ON s.teachers_id = t.id
-        LEFT JOIN daerah d ON s.daerah_id = d.id";
+        LEFT JOIN daerah d ON s.daerah_id = d.id
+        $where
+        ORDER BY s.id DESC
+        LIMIT $start, $limit";
 
-if($keyword != ''){
-    $sql .= " WHERE s.nama_siswa LIKE '%$keyword%' 
-               OR s.jam LIKE '%$keyword%'
-               OR s.hari LIKE '%$keyword%'
-               OR s.tanggal_mulai LIKE '%$keyword%'
-               OR s.tanggal_selesai LIKE '%$keyword%'";
-}
-
-$sql .= " ORDER BY s.id";
 $result = $con->query($sql);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,29 +68,12 @@ $result = $con->query($sql);
 </style>
 </head>
 <body>
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="index.php">YPDC Dashboard</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="add_student.php">Tambah Murid</a></li>
-                <li class="nav-item"><a class="nav-link" href="add_class.php">Naik Kelas</a></li>
-                <li class="nav-item"><a class="nav-link" href="transactions.php">Transaksi</a></li>
-            </ul>
-            <form class="d-flex" method="GET" action="index.php">
-                <input class="form-control me-2" type="search" name="search" placeholder="Cari murid, jam, hari, tanggal" value="<?= htmlspecialchars($keyword) ?>" style="width: 250px;">
-                <button class="btn btn-outline-success" type="submit">Cari</button>
-            </form>
-        </div>
-    </div>
-</nav>
 
+<?php include "navigation.php"; ?>    
+	
 <div class="container-fluid mt-4">
     <h1 class="mb-4">Daftar Murid</h1>
+
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover align-middle">
             <thead class="table-dark text-center">
@@ -119,6 +121,37 @@ $result = $con->query($sql);
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    <?php if($total_pages > 1): ?>
+    <nav>
+        <ul class="pagination justify-content-center mt-4">
+            
+            <!-- Previous -->
+            <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                <a class="page-link" 
+                   href="?page=<?= $page-1 ?>&search=<?= urlencode($keyword) ?>">Previous</a>
+            </li>
+
+            <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                    <a class="page-link" 
+                       href="?page=<?= $i ?>&search=<?= urlencode($keyword) ?>">
+                        <?= $i ?>
+                    </a>
+                </li>
+            <?php endfor; ?>
+
+            <!-- Next -->
+            <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                <a class="page-link" 
+                   href="?page=<?= $page+1 ?>&search=<?= urlencode($keyword) ?>">Next</a>
+            </li>
+
+        </ul>
+    </nav>
+    <?php endif; ?>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

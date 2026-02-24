@@ -15,7 +15,13 @@ $result = $con->query($sql);
     <title>Transaksi Murid</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 </head>
+<style>
+    body { padding-top: 70px; }
+</style>
 <body>
+
+<?php include "navigation.php"; ?>
+
 <div class="container mt-4">
     <h2>Riwayat Transaksi</h2>
     <table class="table table-bordered table-striped mt-3">
