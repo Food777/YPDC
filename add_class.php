@@ -22,6 +22,7 @@ if(isset($_POST['submit'])){
 </head>
 <style>
     body { padding-top: 70px; }
+    body { padding-bottom: 90px; }
 </style>
 <body>
 

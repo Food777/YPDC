@@ -1,17 +1,5 @@
 <?php
-session_start();
-error_reporting(E_ALL);
-
-if(!isset($_SESSION['login'])){
-    header("location:login.php");
-    exit;
-}
-
-$con = mysqli_connect("localhost","root","","YPDC");
-if(mysqli_connect_errno()){
-    echo "Failed to connect: " . mysqli_connect_error();
-    exit;
-}
+include "config.php";
 
 $limit = 10; // jumlah data per halaman
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -28,7 +16,12 @@ if(isset($_GET['search']) && $_GET['search'] != ''){
                OR s.jam LIKE '%$keyword%'
                OR s.hari LIKE '%$keyword%'
                OR s.tanggal_mulai LIKE '%$keyword%'
-               OR s.tanggal_selesai LIKE '%$keyword%'";
+               OR s.tanggal_selesai LIKE '%$keyword%'
+               OR s.daerah_name LIKE '%$keyword%'
+               OR s.teachers_name LIKE '%$keyword%'
+               OR s.nama_ortu LIKE '%$keyword%'
+               OR s.tanggal_lahir LIKE '%$keyword%'
+               OR s.active '%$keyword%'";
 }
 
 
@@ -50,7 +43,7 @@ $sql = "SELECT
         LEFT JOIN teachers t ON s.teachers_id = t.id
         LEFT JOIN daerah d ON s.daerah_id = d.id
         $where
-        ORDER BY s.id DESC
+        ORDER BY s.id ASC
         LIMIT $start, $limit";
 
 $result = $con->query($sql);

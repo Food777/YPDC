@@ -94,7 +94,7 @@
         <table>
             <tr>
                 <td colspan="2" class="text-center">
-                    <h4>Silahkan Lohin</h4>
+                    <h4>Silahkan Login</h4>
                 </td>
             </tr>
             <tr>

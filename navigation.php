@@ -15,7 +15,7 @@
                 <li class="nav-item"><a class="nav-link" href="transactions.php">Transaksi</a></li>
             </ul>
             <form class="d-flex" method="GET" action="index.php">
-                <input class="form-control me-2" type="search" name="search" placeholder="Cari murid, jam, hari, tanggal" value="<?= htmlspecialchars($keyword) ?>" style="width: 250px;">
+                <input class="form-control me-2" type="search" name="search" placeholder="Cari/Search" value="<?= htmlspecialchars($keyword) ?>" style="width: 250px;">
                 <button class="btn btn-outline-success" type="submit">Cari</button>
             </form>
         </div>

@@ -5,6 +5,8 @@ include 'config.php';
 $teachers = $con->query("SELECT * FROM teachers");
 $daerahs = $con->query("SELECT * FROM daerah");
 $parents = $con->query("SELECT DISTINCT nama_ortu FROM students");
+$jam = $con->query("SELECT * FROM jam");
+$hari = $con->query("SELECT * FROM hari");
 
 if(isset($_POST['submit'])){
     $nama = $_POST['nama_siswa'];
@@ -15,7 +17,7 @@ if(isset($_POST['submit'])){
     $active = isset($_POST['active']) ? 1 : 0;
     $tanggal_mulai = $_POST['tanggal_mulai'];
     $tanggal_selesai = $_POST['tanggal_selesai'];
-    $jam = $_POST['jam'];
+    $jam = $_POST['time_value'];
     $hari = $_POST['hari'];
     $daerah_id = $_POST['daerah_id'];
 
@@ -42,6 +44,7 @@ if(isset($_POST['submit'])){
 </head>
 <style>
     body { padding-top: 30px; }
+    body { padding-bottom: 90px; }
 </style>
 
 <body>
@@ -90,16 +93,26 @@ if(isset($_POST['submit'])){
             <input type="date" name="tanggal_selesai" class="form-control">
         </div>
         <div class="mb-3">
-            <label>Jam</label>
-            <input type="text" name="jam" class="form-control" placeholder="08:00 - 10:00">
+            <label>Jam <span class="text-danger">*</span></label>
+            <select name="jam" class="form-select" required>
+                <option value="">-- Pilih Jam --</option>
+                <?php while($j = $jam->fetch_assoc()): ?>
+                    <option value="<?= $j['id'] ?>"><?= $j['time_value'] ?></option>
+                <?php endwhile; ?>
+            </select>
         </div>
         <div class="mb-3">
-            <label>Hari</label>
-            <input type="text" name="hari" class="form-control" placeholder="Senin / Selasa ...">
+            <label>Hari <span class="text-danger">*</span></label>
+            <select name="hari" class="form-select" required>
+                <option value="">-- Pilih Hari --</option>
+                <?php while($h = $hari->fetch_assoc()): ?>
+                    <option value="<?= $h['id'] ?>"><?= $h['name'] ?></option>
+                <?php endwhile; ?>
+            </select>
         </div>
         <div class="mb-3">
             <label>Daerah</label>
-            <select name="daerah_id" class="form-select">
+            <select name="daerah_id" class="form-select" required>
                 <option value="">-- Pilih Daerah --</option>
                 <?php while($d = $daerahs->fetch_assoc()): ?>
                     <option value="<?= $d['id'] ?>"><?= $d['name'] ?></option>
