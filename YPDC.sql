@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Feb 23, 2026 at 04:03 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Host: 127.0.0.1
+-- Generation Time: Feb 25, 2026 at 04:02 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `YPDC`
+-- Database: `ypdc`
 --
 
 -- --------------------------------------------------------
@@ -88,6 +88,58 @@ INSERT INTO `daerah` (`id`, `name`) VALUES
 (1, 'GDL'),
 (2, 'Spazio'),
 (3, 'DPU');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hari`
+--
+
+CREATE TABLE `hari` (
+  `id` int(11) NOT NULL,
+  `name` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `hari`
+--
+
+INSERT INTO `hari` (`id`, `name`) VALUES
+(1, 'Senin'),
+(2, 'Selasa'),
+(3, 'Rabu'),
+(4, 'Kamis'),
+(5, 'Jumat'),
+(6, 'Sabtu');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jam`
+--
+
+CREATE TABLE `jam` (
+  `id` int(11) NOT NULL,
+  `time_value` time NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `jam`
+--
+
+INSERT INTO `jam` (`id`, `time_value`) VALUES
+(1, '09:00:00'),
+(2, '10:00:00'),
+(3, '11:00:00'),
+(4, '12:00:00'),
+(5, '13:00:00'),
+(6, '14:00:00'),
+(7, '15:00:00'),
+(8, '16:00:00'),
+(9, '17:00:00'),
+(10, '18:00:00'),
+(11, '19:00:00'),
+(12, '20:00:00');
 
 -- --------------------------------------------------------
 
@@ -171,15 +223,9 @@ CREATE TABLE `students` (
   `jam` time DEFAULT NULL,
   `hari` varchar(20) DEFAULT NULL,
   `daerah_id` int(11) DEFAULT NULL,
-  `teachers_id` int(11) DEFAULT NULL
+  `teachers_id` int(11) DEFAULT NULL,
+  `kelas_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `students`
---
-
-INSERT INTO `students` (`id`, `nama_siswa`, `nama_ortu`, `tanggal_lahir`, `alamat`, `active`, `tanggal_mulai`, `tanggal_selesai`, `jam`, `hari`, `daerah_id`, `teachers_id`) VALUES
-(6, 'Jonas', 'Poppy', '3312-02-11', '2312313', 1, NULL, NULL, NULL, NULL, NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -275,6 +321,18 @@ ALTER TABLE `daerah`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `hari`
+--
+ALTER TABLE `hari`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `jam`
+--
+ALTER TABLE `jam`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `kelas`
 --
 ALTER TABLE `kelas`
@@ -346,6 +404,18 @@ ALTER TABLE `daerah`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `hari`
+--
+ALTER TABLE `hari`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `jam`
+--
+ALTER TABLE `jam`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
 -- AUTO_INCREMENT for table `kelas`
 --
 ALTER TABLE `kelas`
@@ -361,7 +431,7 @@ ALTER TABLE `pembayaran`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `student_class`
