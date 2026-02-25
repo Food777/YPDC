@@ -1,15 +1,15 @@
 <?php
 include "config.php";
 
-$limit = 10; // jumlah data per halaman
+$limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 if($page < 1) $page = 1;
-
 $start = ($page - 1) * $limit;
 
 $keyword = '';
 $where = "";
 
+// Search
 if(isset($_GET['search']) && $_GET['search'] != ''){
     $keyword = $con->real_escape_string($_GET['search']);
     $where = " WHERE s.nama_siswa LIKE '%$keyword%' 
@@ -17,35 +17,75 @@ if(isset($_GET['search']) && $_GET['search'] != ''){
                OR s.hari LIKE '%$keyword%'
                OR s.tanggal_mulai LIKE '%$keyword%'
                OR s.tanggal_selesai LIKE '%$keyword%'
-               OR s.daerah_name LIKE '%$keyword%'
-               OR s.teachers_name LIKE '%$keyword%'
+               OR d.name LIKE '%$keyword%'
+               OR t.name LIKE '%$keyword%'
                OR s.nama_ortu LIKE '%$keyword%'
                OR s.tanggal_lahir LIKE '%$keyword%'
-               OR s.active '%$keyword%'";
+               OR s.active LIKE '%$keyword%'
+               OR k.nama_kelas LIKE '%$keyword%'";
 }
 
+// Sort
+$sort_column = "s.id";
+$order = "ASC";
+$allowed_sort = ['s.nama_siswa','s.tanggal_lahir','s.tanggal_mulai','s.tanggal_selesai','j.time_value','h.name','t.name','d.name','k.name'];
+$allowed_order = ['ASC','DESC'];
 
-$count_sql = "SELECT COUNT(*) as total 
-              FROM students s
+if(isset($_GET['sort']) && in_array($_GET['sort'],$allowed_sort)){
+    $sort_column = $_GET['sort'];
+}
+if(isset($_GET['order']) && in_array($_GET['order'],$allowed_order)){
+    $order = $_GET['order'];
+}
+
+// Dynamic filter berdasarkan kolom terpilih
+$filter_options = [];
+$filter_value = '';
+if(isset($_GET['sort']) && in_array($_GET['sort'],$allowed_sort)){
+    $filter_sql = "SELECT DISTINCT $sort_column FROM students s
+                   LEFT JOIN teachers t ON s.teachers_id = t.id
+                   LEFT JOIN daerah d ON s.daerah_id = d.id
+                   LEFT JOIN kelas k ON s.kelas_id = k.id";
+    $filter_result = $con->query($filter_sql);
+    if($filter_result){
+        while($f = $filter_result->fetch_assoc()){
+            $filter_options[] = $f[$sort_column];
+        }
+    }
+
+    if(isset($_GET['filter']) && in_array($_GET['filter'], $filter_options)){
+        $filter_value = $_GET['filter'];
+        $where .= ($where ? " AND " : " WHERE ") . "$sort_column = '$filter_value'";
+    }
+}
+
+// Hitung total data
+$count_sql = "SELECT COUNT(*) as total FROM students s
               LEFT JOIN teachers t ON s.teachers_id = t.id
               LEFT JOIN daerah d ON s.daerah_id = d.id
+              LEFT JOIN kelas k ON s.kelas_id = k.id
               $where";
-
 $count_result = $con->query($count_sql);
 $total_data = $count_result->fetch_assoc()['total'];
 $total_pages = ceil($total_data / $limit);
 
-$sql = "SELECT 
-            s.id, s.nama_siswa, s.nama_ortu, s.tanggal_lahir, s.alamat, s.active, 
-            s.tanggal_mulai, s.tanggal_selesai, s.jam, s.hari, 
-            t.name AS teachers_name, d.name AS daerah_name
+// Query data murid
+$sql = "SELECT s.id, s.nama_siswa, s.nama_ortu, s.tanggal_lahir, s.alamat, s.active,
+               s.tanggal_mulai, s.tanggal_selesai,
+               t.name AS teachers_name,
+               d.name AS daerah_name,
+               k.name AS kelas_name,
+               j.time_value AS jam_name,  -- <-- ambil nama jam
+               h.name AS hari_name
         FROM students s
         LEFT JOIN teachers t ON s.teachers_id = t.id
         LEFT JOIN daerah d ON s.daerah_id = d.id
+        LEFT JOIN kelas k ON s.kelas_id = k.id
+        LEFT JOIN jam j ON s.jam = j.id      -- <-- join table jam
+        LEFT JOIN hari h ON s.hari = h.id
         $where
-        ORDER BY s.id ASC
+        ORDER BY $sort_column $order
         LIMIT $start, $limit";
-
 $result = $con->query($sql);
 ?>
 
@@ -62,10 +102,15 @@ $result = $con->query($sql);
 </head>
 <body>
 
-<?php include "navigation.php"; ?>    
-	
+<?php include "navigation.php"; ?>
+
 <div class="container-fluid mt-4">
     <h1 class="mb-4">Daftar Murid</h1>
+    <h4 class="mb-4">
+        Selamat Datang, <?= isset($_SESSION['name']) ? ucwords($_SESSION['name']) : 'User'; ?> 👋
+    </h4>
+
+    <?php include "sort.php"; ?>
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover align-middle">
@@ -79,6 +124,7 @@ $result = $con->query($sql);
                     <th>Aktif</th>
                     <th>Tanggal Mulai</th>
                     <th>Tanggal Selesai</th>
+                    <th>Kelas</th>
                     <th>Jam</th>
                     <th>Hari</th>
                     <th>Daerah</th>
@@ -91,15 +137,16 @@ $result = $con->query($sql);
                     <?php while($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td class="text-center"><?= $row['id'] ?></td>
-                        <td><?= $row['nama_siswa'] ?></td>
-                        <td><?= $row['nama_ortu'] ?></td>
+                        <td><?= ucwords($row['nama_siswa']) ?></td>
+                        <td><?= ucwords($row['nama_ortu']) ?></td>
                         <td><?= $row['tanggal_lahir'] ?></td>
                         <td><?= $row['alamat'] ?></td>
                         <td class="text-center"><?= $row['active'] ? 'Ya' : 'Tidak' ?></td>
                         <td><?= $row['tanggal_mulai'] ?></td>
                         <td><?= $row['tanggal_selesai'] ?></td>
-                        <td><?= $row['jam'] ?></td>
-                        <td><?= $row['hari'] ?></td>
+                        <td><?= $row['kelas_name'] ?></td>
+                        <td><?= $row['jam_name'] ?></td>
+                        <td><?= $row['hari_name'] ?></td>
                         <td><?= $row['daerah_name'] ?></td>
                         <td><?= $row['teachers_name'] ?></td>
                         <td class="text-center">
@@ -109,42 +156,30 @@ $result = $con->query($sql);
                     </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <tr><td colspan="13" class="text-center">Tidak ada data</td></tr>
+                    <tr><td colspan="14" class="text-center">Tidak ada data</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
-    <?php if($total_pages > 1): ?>
-    <nav>
-        <ul class="pagination justify-content-center mt-4">
-            
-            <!-- Previous -->
-            <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
-                <a class="page-link" 
-                   href="?page=<?= $page-1 ?>&search=<?= urlencode($keyword) ?>">Previous</a>
-            </li>
-
-            <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                    <a class="page-link" 
-                       href="?page=<?= $i ?>&search=<?= urlencode($keyword) ?>">
-                        <?= $i ?>
-                    </a>
+    <?php if($total_pages>1): ?>
+        <nav>
+            <ul class="pagination justify-content-center mt-4">
+                <li class="page-item <?= ($page<=1)?'disabled':'' ?>">
+                    <a class="page-link" href="?page=<?= $page-1 ?>&search=<?= urlencode($keyword) ?>&sort=<?= $sort_column ?>&filter=<?= urlencode($filter_value) ?>&order=<?= $order ?>">Previous</a>
                 </li>
-            <?php endfor; ?>
-
-            <!-- Next -->
-            <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
-                <a class="page-link" 
-                   href="?page=<?= $page+1 ?>&search=<?= urlencode($keyword) ?>">Next</a>
-            </li>
-
-        </ul>
-    </nav>
+                <?php for($i=1;$i<=$total_pages;$i++): ?>
+                    <li class="page-item <?= ($i==$page)?'active':'' ?>">
+                        <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($keyword) ?>&sort=<?= $sort_column ?>&filter=<?= urlencode($filter_value) ?>&order=<?= $order ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+                <li class="page-item <?= ($page>=$total_pages)?'disabled':'' ?>">
+                    <a class="page-link" href="?page=<?= $page+1 ?>&search=<?= urlencode($keyword) ?>&sort=<?= $sort_column ?>&filter=<?= urlencode($filter_value) ?>&order=<?= $order ?>">Next</a>
+                </li>
+            </ul>
+        </nav>
     <?php endif; ?>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

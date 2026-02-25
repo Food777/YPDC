@@ -1,41 +1,44 @@
 <?php
-    session_start();
-    error_reporting(E_ALL);
-    //step 1 - koneksi dengan apache, mysql sekaligus memilih databasenya
-    $con = mysqli_connect("localhost","root","","YPDC");
-    // Check connection
-    if (mysqli_connect_errno())
-    {
-        echo "Failed to connect to MySQL: " . mysqli_connect_error();
+session_start();
+error_reporting(E_ALL);
+$con = mysqli_connect("localhost","root","","YPDC");
+
+// Cek koneksi
+if (mysqli_connect_errno()) {
+    echo "Failed to connect to MySQL: " . mysqli_connect_error();
+    exit;
+}
+
+// Ambil data dari form
+if(isset($_POST['name']) && isset($_POST['password'])) {
+    $name = $_POST["name"];
+    $pw = md5($_POST["password"]); // kalau pakai md5
+
+    // Query user
+    $sql = "SELECT * FROM users WHERE name='$name' AND password='$pw'";
+    $rs = mysqli_query($con, $sql);
+
+    if(!$rs) {
+        die("Query error: ".mysqli_error($con));
     }
 
-    //step 2 - query yang akan dikirimkan ke MySQL
-    //2
-    $name = $_POST["name"]; //reyner
-    $pw = md5($_POST["password"]); //reyner12345
-    $sql= "SELECT * FROM users ";
-    $sql.= "WHERE name = '" .$name."' and password ='". $pw ."'";
-    $rs= mysqli_query($con,$sql);
-    
-    echo $sql;
+    $row = mysqli_fetch_assoc($rs);
 
-    // Associative array
-    $row=mysqli_fetch_array($rs,MYSQLI_ASSOC);
-    if(isset($row['name']) == false)
-    {
-        echo "Gagal login"; 
+    if(!$row) {
+        // Login gagal
         $_SESSION['gagallogin'] = "Unknown username or password";
-        header("location:login.php");
+        header("Location: login.php");
         exit;
-    }
-    else
-    {
-        echo "Berhasil login";
+    } else {
+        // Login berhasil
         $_SESSION['login'] = true;
-        $_SESSION['id'] = $row['id'];
-        header("location:index.php");
+        $_SESSION['id'] = $row['id'];       // Simpan ID user
+        $_SESSION['name'] = $row['name'];   // Simpan nama user
+
+        header("Location: index.php");
         exit;
     }
-
-
+} else {
+    echo "Form belum di-submit!";
+}
 ?>

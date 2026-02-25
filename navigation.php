@@ -13,6 +13,9 @@
                 <li class="nav-item"><a class="nav-link" href="add_student.php">Tambah Murid</a></li>
                 <li class="nav-item"><a class="nav-link" href="add_class.php">Naik Kelas</a></li>
                 <li class="nav-item"><a class="nav-link" href="transactions.php">Transaksi</a></li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="logout.php">Keluar</a>
+                </li>
             </ul>
             <form class="d-flex" method="GET" action="index.php">
                 <input class="form-control me-2" type="search" name="search" placeholder="Cari/Search" value="<?= htmlspecialchars($keyword) ?>" style="width: 250px;">

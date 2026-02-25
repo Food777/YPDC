@@ -9,12 +9,28 @@ if(!$id){
     exit;
 }
 
-// Ambil data murid
-$result = $con->query("SELECT * FROM students WHERE id=$id");
+// Ambil data murid beserta relasinya
+$sql = "SELECT s.*, 
+               k.id AS kelas_id, k.name AS kelas_name,
+               j.id AS jam_id, j.time_value AS jam_value,
+               h.id AS hari_id, h.name AS hari_name,
+               d.id AS daerah_id, d.name AS daerah_name
+        FROM students s
+        LEFT JOIN kelas k ON s.kelas_id = k.id
+        LEFT JOIN jam j ON s.jam = j.id
+        LEFT JOIN hari h ON s.hari = h.id
+        LEFT JOIN daerah d ON s.daerah_id = d.id
+        WHERE s.id = $id";
+
+$result = $con->query($sql);
 $student = $result->fetch_assoc();
 
-// Ambil daftar teacher
+// Ambil daftar pilihan
 $teachers = $con->query("SELECT * FROM teachers");
+$daerahs = $con->query("SELECT * FROM daerah");
+$jam = $con->query("SELECT * FROM jam");
+$hari = $con->query("SELECT * FROM hari");
+$kelas = $con->query("SELECT * FROM kelas");
 
 // Jika form dikirim
 if(isset($_POST['submit'])){
@@ -24,6 +40,12 @@ if(isset($_POST['submit'])){
     $alamat = $_POST['alamat'];
     $teacher_id = $_POST['teachers_id'];
     $active = isset($_POST['active']) ? 1 : 0;
+    $kelas_id = $_POST['kelas_id'];
+    $jam_id = $_POST['jam_id'];
+    $hari_id = $_POST['hari_id'];
+    $daerah_id = $_POST['daerah_id'];
+    $tanggal_mulai = $_POST['tanggal_mulai'];
+    $tanggal_selesai = $_POST['tanggal_selesai'];
 
     $sql = "UPDATE students SET 
             nama_siswa='$nama',
@@ -31,7 +53,13 @@ if(isset($_POST['submit'])){
             tanggal_lahir='$tgl_lahir',
             alamat='$alamat',
             teachers_id=$teacher_id,
-            active=$active
+            active=$active,
+            kelas_id=$kelas_id,
+            jam='$jam_id',
+            hari='$hari_id',
+            daerah_id=$daerah_id,
+            tanggal_mulai='$tanggal_mulai',
+            tanggal_selesai='$tanggal_selesai'
             WHERE id=$id";
 
     if($con->query($sql)){
@@ -42,13 +70,17 @@ if(isset($_POST['submit'])){
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Edit Murid</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+<meta charset="UTF-8">
+<title>Edit Murid</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<style>
+    body { padding-top: 30px; padding-bottom: 90px; }
+</style>
 <body>
 
 <?php include "navigation.php"; ?>
@@ -81,6 +113,50 @@ if(isset($_POST['submit'])){
                 <?php endwhile; ?>
             </select>
         </div>
+        <div class="mb-3">
+            <label>Kelas <span class="text-danger">*</span></label>
+            <select name="kelas_id" class="form-select" required>
+                <option value="">-- Pilih Kelas --</option>
+                <?php while($k = $kelas->fetch_assoc()): ?>
+                    <option value="<?= $k['id'] ?>" <?= $k['id']==$student['kelas_id']?'selected':'' ?>><?= $k['name'] ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Jam <span class="text-danger">*</span></label>
+            <select name="jam_id" class="form-select" required>
+                <option value="">-- Pilih Jam --</option>
+                <?php while($j = $jam->fetch_assoc()): ?>
+                    <option value="<?= $j['id'] ?>" <?= $j['id']==$student['jam']?'selected':'' ?>><?= $j['time_value'] ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Hari <span class="text-danger">*</span></label>
+            <select name="hari_id" class="form-select" required>
+                <option value="">-- Pilih Hari --</option>
+                <?php while($h = $hari->fetch_assoc()): ?>
+                    <option value="<?= $h['id'] ?>" <?= $h['id']==$student['hari']?'selected':'' ?>><?= $h['name'] ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Daerah <span class="text-danger">*</span></label>
+            <select name="daerah_id" class="form-select" required>
+                <option value="">-- Pilih Daerah --</option>
+                <?php while($d = $daerahs->fetch_assoc()): ?>
+                    <option value="<?= $d['id'] ?>" <?= $d['id']==$student['daerah_id']?'selected':'' ?>><?= $d['name'] ?></option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Tanggal Mulai</label>
+            <input type="date" name="tanggal_mulai" class="form-control" value="<?= $student['tanggal_mulai'] ?>">
+        </div>
+        <div class="mb-3">
+            <label>Tanggal Selesai</label>
+            <input type="date" name="tanggal_selesai" class="form-control" value="<?= $student['tanggal_selesai'] ?>">
+        </div>
         <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" value="1" name="active" <?= $student['active']?'checked':'' ?>>
             <label class="form-check-label">Aktif</label>
@@ -89,6 +165,7 @@ if(isset($_POST['submit'])){
         <a href="index.php" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
