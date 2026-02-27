@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 25, 2026 at 04:02 AM
+-- Generation Time: Feb 27, 2026 at 03:27 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -270,12 +270,13 @@ INSERT INTO `teachers` (`id`, `name`) VALUES
 
 CREATE TABLE `transaksi` (
   `id` int(11) NOT NULL,
-  `nomor_rekening` varchar(100) DEFAULT NULL,
-  `nama_rekening` varchar(100) DEFAULT NULL,
-  `tanggal_pembayaran` date DEFAULT NULL,
-  `pembayaran_id` int(11) DEFAULT NULL,
   `students_id` int(11) DEFAULT NULL,
-  `bulan_id` int(11) DEFAULT NULL
+  `pembayaran_id` int(11) DEFAULT NULL,
+  `bulan_id` int(11) DEFAULT NULL,
+  `no_rekening` varchar(50) DEFAULT NULL,
+  `tanggal_pembayaran` date DEFAULT NULL,
+  `nominal` decimal(10,2) DEFAULT NULL,
+  `keterangan` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -369,10 +370,7 @@ ALTER TABLE `teachers`
 -- Indexes for table `transaksi`
 --
 ALTER TABLE `transaksi`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `pembayaran_id` (`pembayaran_id`),
-  ADD KEY `students_id` (`students_id`),
-  ADD KEY `bulan_id` (`bulan_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `users`
@@ -473,14 +471,6 @@ ALTER TABLE `students`
 ALTER TABLE `student_class`
   ADD CONSTRAINT `student_class_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `student_class_ibfk_2` FOREIGN KEY (`class_id`) REFERENCES `kelas` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `transaksi`
---
-ALTER TABLE `transaksi`
-  ADD CONSTRAINT `transaksi_ibfk_1` FOREIGN KEY (`pembayaran_id`) REFERENCES `pembayaran` (`id`),
-  ADD CONSTRAINT `transaksi_ibfk_2` FOREIGN KEY (`students_id`) REFERENCES `students` (`id`),
-  ADD CONSTRAINT `transaksi_ibfk_3` FOREIGN KEY (`bulan_id`) REFERENCES `bulan` (`id`);
 
 --
 -- Constraints for table `users`

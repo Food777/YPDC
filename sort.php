@@ -28,6 +28,8 @@
             <option value="ASC" <?= ($order=='ASC')?'selected':'' ?>>Menaik</option>
             <option value="DESC" <?= ($order=='DESC')?'selected':'' ?>>Menurun</option>
         </select>
-
-        <button type="submit" class="btn btn-primary mb-2">Terapkan</button>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Terapkan</button>
+            <a href="index.php" class="btn btn-secondary">Kembali</a>
+        </div>
     </form>

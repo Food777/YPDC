@@ -44,7 +44,7 @@ if(isset($_POST['submit'])){
     <title>Tambah Murid</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { padding-top: 30px; padding-bottom: 90px; }
+        body { padding-top: 70px; padding-bottom: 90px; }
     </style>
 </head>
 <body>

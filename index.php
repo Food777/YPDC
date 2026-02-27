@@ -75,13 +75,13 @@ $sql = "SELECT s.id, s.nama_siswa, s.nama_ortu, s.tanggal_lahir, s.alamat, s.act
                t.name AS teachers_name,
                d.name AS daerah_name,
                k.name AS kelas_name,
-               j.time_value AS jam_name,  -- <-- ambil nama jam
+               j.time_value AS jam_name,  
                h.name AS hari_name
         FROM students s
         LEFT JOIN teachers t ON s.teachers_id = t.id
         LEFT JOIN daerah d ON s.daerah_id = d.id
         LEFT JOIN kelas k ON s.kelas_id = k.id
-        LEFT JOIN jam j ON s.jam = j.id      -- <-- join table jam
+        LEFT JOIN jam j ON s.jam = j.id      
         LEFT JOIN hari h ON s.hari = h.id
         $where
         ORDER BY $sort_column $order
