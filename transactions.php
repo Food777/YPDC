@@ -50,7 +50,6 @@ $result = $con->query($sql);
                 <tr>
                     <th>ID</th>
                     <th>Nama Siswa</th>
-                    <th>Pembayaran ID</th>
                     <th>Nama Bank / Wallet</th>
                     <th>Bulan ID</th>
                     <th>Nama Bulan</th>
@@ -66,7 +65,6 @@ $result = $con->query($sql);
                         <tr>
                             <td><?= $row['id'] ?></td>
                             <td><?= $row['nama_siswa'] ?></td>
-                            <td><?= $row['pembayaran_id'] ?></td>
                             <td><?= $row['nama_pembayaran'] ?></td>
                             <td><?= $row['bulan_id'] ?></td>
                             <td><?= $row['nama_bulan'] ?></td>
